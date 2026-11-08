@@ -22,7 +22,7 @@ public class DataSourceConfig {
     public DataSource h2DataSource() {
         return DataSourceBuilder.create()
                 .driverClassName("org.h2.Driver")
-                .url("jdbc:h2:mem:jira-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;NON_KEYWORDS=VALUE")
+                .url("jdbc:h2:mem:;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;NON_KEYWORDS=VALUE")
                 .username("sa")
                 .password("")
                 .build();
