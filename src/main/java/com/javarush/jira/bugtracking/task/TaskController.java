@@ -127,6 +127,13 @@ public class TaskController {
         taskService.unAssign(id, userType, AuthUser.authId());
     }
 
+    @PostMapping("/{id}/tags")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addTag(@PathVariable long id, @NotBlank @RequestParam String tag) {
+        log.info("add tag {} to task {}", tag, id);
+        taskService.addTag(id, tag);
+    }
+
     @GetMapping("/{id}/comments")
     public List<ActivityTo> getComments(@PathVariable long id) {
         log.info("get comments for task with id={}", id);
