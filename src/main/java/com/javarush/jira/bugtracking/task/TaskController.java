@@ -163,4 +163,16 @@ public class TaskController {
             this(taskTo, new LinkedList<>());
         }
     }
+
+    @GetMapping("/{id}/work-time")
+    public long getWorkTime(@PathVariable long id) {
+        log.info("get working time for task with id={}", id);
+        return taskService.getWorkTime(id);
+    }
+
+    @GetMapping("/{id}/test-time")
+    public long getTestTime(@PathVariable long id) {
+        log.info("get testing time for task with id={}", id);
+        return taskService.getTestTime(id);
+    }
 }

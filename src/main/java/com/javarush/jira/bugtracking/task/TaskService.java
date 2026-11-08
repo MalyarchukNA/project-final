@@ -146,4 +146,39 @@ public class TaskService {
         Task task = handler.getRepository().getExisted(id);
         task.getTags().add(tag);
     }
+
+    @Transactional(readOnly = true)
+    public long getWorkTime(long id) {
+        Task task = handler.getRepository().getExisted(id);
+        return getTimeBetweenStatuses(task, "in_progress", "ready_for_review");
+    }
+
+    @Transactional(readOnly = true)
+    public long getTestTime(long id) {
+        Task task = handler.getRepository().getExisted(id);
+        return getTimeBetweenStatuses(task, "ready_for_review", "done");
+    }
+
+    private long getTimeBetweenStatuses(Task task, String startStatus, String endStatus) {
+        if (task.getActivities() == null) {
+            return 0;
+        }
+
+        LocalDateTime startTime = task.getActivities().stream()
+                .filter(a -> startStatus.equals(a.getStatusCode()))
+                .map(Activity::getUpdated)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime endTime = task.getActivities().stream()
+                .filter(a -> endStatus.equals(a.getStatusCode()))
+                .map(Activity::getUpdated)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        if (startTime != null && endTime != null && !endTime.isBefore(startTime)) {
+            return java.time.Duration.between(startTime, endTime).toMinutes();
+        }
+        return 0;
+    }
 }
