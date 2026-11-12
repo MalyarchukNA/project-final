@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: jira
+      POSTGRES_USER: jira
+      POSTGRES_PASSWORD: JiraRush
+    ports:
+      - "5432:5432"
+    networks:
+      - jiralib-net
+    restart: always
+
+  jirarush-app:
+    build: .
+    container_name: jirarush-app
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres-db
+      - APP_TEST_MAIL=jira4jr@gmail.com
+      - SPRING_DATASOURCE_USERNAME=jira
+      - SPRING_DATASOURCE_PASSWORD=JiraRush
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID=3d0d8738e65881fff266
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET=0f97031ce6178b7dfb67a6af587f37e222a16120
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=329113642700-f8if6pu68j2repq3ef6umd5jgiliup60.apps.googleusercontent.com
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=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
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITLAB_CLIENT_ID=b8520a3266089063c0d8261cce36971defa513f5ffb7a3d16728fc83a494
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITLAB_CLIENT_SECRET=e72c65320cf9d6495984a37b0f9cc03ec46be0bb6f071feaebbfe75168117004
+      - SPRING_MAIL_USERNAME=jira4jr@gmail.com
+      - SPRING_MAIL_PASSWORD=zdfzsrqvgimldzyj
+      - SPRING_THYMELEAF_PREFIX=file:/app/resources/view/
+      - SPRING_THYMELEAF_CHECK_TEMPLATE_LOCATION=false
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - postgres-db
+    networks:
+      - jiralib-net
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./resources:/opt/jirarush/resources:ro
+    depends_on:
+      - jirarush-app
+    networks:
+      - jiralib-net
+    restart: always
+
+networks:
+  jiralib-net:
+    driver: bridge

@@ -127,6 +127,13 @@ public class TaskController {
         taskService.unAssign(id, userType, AuthUser.authId());
     }
 
+    @PostMapping("/{id}/tags")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addTag(@PathVariable long id, @NotBlank @RequestParam String tag) {
+        log.info("add tag {} to task {}", tag, id);
+        taskService.addTag(id, tag);
+    }
+
     @GetMapping("/{id}/comments")
     public List<ActivityTo> getComments(@PathVariable long id) {
         log.info("get comments for task with id={}", id);
@@ -155,5 +162,17 @@ public class TaskController {
         public TaskTreeNode(TaskTo taskTo) {
             this(taskTo, new LinkedList<>());
         }
+    }
+
+    @GetMapping("/{id}/work-time")
+    public long getWorkTime(@PathVariable long id) {
+        log.info("get working time for task with id={}", id);
+        return taskService.getWorkTime(id);
+    }
+
+    @GetMapping("/{id}/test-time")
+    public long getTestTime(@PathVariable long id) {
+        log.info("get testing time for task with id={}", id);
+        return taskService.getTestTime(id);
     }
 }
